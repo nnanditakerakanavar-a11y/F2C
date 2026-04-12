@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2 style="text-align:center; color:#2e7d32;">
+    My Orders
+</h2>
+
+<div style="
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:20px;
+    margin-top:30px;
+">
+
+    {% for order in orders %}
+
+        <div style="
+            width:300px;
+            background:#9dcdd1;
+            border-radius:20px;
+            padding:15px;
+            box-shadow:0 15px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s;
+        ">
+
+            <h3>
+                {{ order.product.name }}
+            </h3>
+
+            <p>
+                <strong>Quantity:</strong> {{ order.quantity }}
+            </p>
+
+            <p>
+                <strong>Total Price:</strong> ₹{{ order.total_price }}
+            </p>
+
+            <p>
+                <strong>Status:</strong> {{ order.status }}
+            </p>
+
+            <p>
+                <strong>Ordered At:</strong>
+                {{ order.created_at|date:"d M Y H:i" }}
+            </p>
+
+            <!-- FARMER CAN UPDATE ORDER STATUS -->
+            {% if user.farmer %}
+
+            <form method="post" action="{% url 'update_order_status' order.id %}" style="margin-top:10px;">
+                {% csrf_token %}
+
+                <select name="status" style="
+                    width:100%;
+                    padding:8px;
+                    border-radius:10px;
+                    margin-bottom:10px;
+                ">
+                    <option>Pending</option>
+                    <option value="Accepted">Accepted</option>
+                    <option value="Rejected">Rejected</option>        <option>Preparing</option>
+                    <option>Out for Delivery</option>
+                    <option value="Delivered">Delivered</option>
+                </select>
+
+                <button type="submit" style="
+                    width:100%;
+                    background:yellow;
+                    border:none;
+                    padding:8px;
+                    border-radius:20px;
+                    font-weight:bold;
+                    cursor:pointer;
+                ">
+                    Update Status
+                </button>
+
+            </form>
+
+            {% endif %}
+
+        </div>
+
+    {% empty %}
+
+        <p style="
+            text-align:center;
+            font-size:18px;
+            color:#444;
+        ">
+            No orders placed yet.
+        </p>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}

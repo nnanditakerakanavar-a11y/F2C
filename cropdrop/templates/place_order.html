@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2 style="text-align:center; color:#2e7d32;">Place Order</h2>
+
+<div style="
+    max-width:450px;
+    margin:30px auto;
+    background:#90b1b7;
+    padding:25px;
+    border-radius:20px;
+    box-shadow:0 15px 35px rgba(0,0,0,0.2);
+">
+
+    <h3 style="text-align:center;">{{ product.name }}</h3>
+
+    <p><b>Price:</b> ₹{{ product.price }} / {{ product.unit }}</p>
+    <p><b>Available Quantity:</b> {{ product.quantity }} {{ product.unit }}</p>
+
+    {% if error %}
+        <p style="color:red; text-align:center;">{{ error }}</p>
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <!-- Quantity -->
+        <label><b>Quantity</b></label>
+        <input type="number"
+               name="quantity"
+               value="1"
+               min="1"
+               max="{{ product.quantity }}"
+               style="width:100%; padding:10px; margin:10px 0; border-radius:10px; border:1px solid #ccc;">
+
+        <!-- Unit -->
+        <label><b>Unit</b></label>
+        <select name="unit"
+                style="width:100%; padding:10px; margin-bottom:15px; border-radius:10px; border:1px solid #ccc;">
+            <option value="kg">kg</option>
+            <option value="g">g</option>
+        </select>
+
+        <hr style="margin:15px 0;">
+
+        <h4 style="text-align:center; color:#2e7d32;">Your Details</h4>
+
+        <!-- Customer Name -->
+        <label><b>Name</b></label>
+        <input type="text"
+               name="name"
+               value="{{ request.user.first_name }} {{ request.user.last_name }}"
+               placeholder="Enter your name"
+               required
+               style="width:100%; padding:10px; margin:5px 0 10px 0; border-radius:10px; border:1px solid #0a0a0a;">
+
+        <!-- Customer Phone -->
+        <label><b>Phone</b></label>
+        <input type="text"
+               name="phone"
+               value="{{ request.user.customer.phone }}"
+               placeholder="Enter your phone number"
+               required
+               style="width:100%; padding:10px; margin:5px 0 10px 0; border-radius:10px; border:1px solid #090909;">
+
+        <!-- Address -->
+        <label><b>Address</b></label>
+        <textarea name="address"
+                  placeholder="Enter your address"
+                  required
+                  style="width:100%; padding:10px; margin:5px 0 10px 0; border-radius:10px; border:1px solid #0f0e0e; resize:none;"></textarea>
+
+        <!-- City -->
+        <label><b>City</b></label>
+        <input type="text"
+               name="city"
+               placeholder="Enter your city"
+               required
+               style="width:100%; padding:10px; margin:5px 0 10px 0; border-radius:10px; border:1px solid #111111;">
+
+        <!-- Pincode -->
+        <label><b>Pincode</b></label>
+        <input type="text"
+               name="pincode"
+               placeholder="Enter your pincode"
+               required
+               style="width:100%; padding:10px; margin:5px 0 15px 0; border-radius:10px; border:1px solid #ccc;">
+
+        <button type="submit"
+                style="width:100%; background:yellow; color:black; font-weight:bold; padding:12px; border:none; border-radius:20px; cursor:pointer; transition:0.3s;">
+            Place Order
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}

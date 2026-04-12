@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+
+.payment-box{
+    width:400px;
+    margin:auto;
+    background:white;
+    padding:30px;
+    border-radius:20px;
+    text-align:center;
+    box-shadow:0 15px 35px rgba(0,0,0,0.2);
+}
+
+.payment-box h2{
+    color:#2e7d32;
+}
+
+.payment-box p{
+    font-size:18px;
+}
+
+.order-btn{
+    margin-top:20px;
+    padding:12px 25px;
+    background:#2e7d32;
+    color:white;
+    border:none;
+    border-radius:25px;
+    font-size:16px;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.order-btn:hover{
+    background:#1b5e20;
+    transform:scale(1.05);
+}
+
+</style>
+
+<div class="payment-box">
+
+<h2>Cash on Delivery</h2>
+
+<p>You will pay when the product is delivered to your home.</p>
+
+<form method="POST">
+{% csrf_token %}
+
+<button type="submit" class="order-btn">
+Place Order (Cash on Delivery)
+</button>
+
+</form>
+
+</div>
+
+{% endblock %}

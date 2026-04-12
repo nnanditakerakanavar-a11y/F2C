@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<style>
+
+/* GOOGLE FONT */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap');
+
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    color: white;
+}
+
+/* HERO BACKGROUND IMAGE + OVERLAY */
+.hero {
+    height: 100vh;
+    background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.7)),
+                url("{% static 'images/farm-bg.jpg' %}");
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* HERO TEXT */
+.hero h1 {
+    font-size: 60px;
+    margin: 0;
+    animation: fadeDown 1s ease;
+}
+
+.hero p {
+    font-size: 22px;
+    margin: 15px 0 25px;
+    opacity: 0.9;
+    animation: fadeUp 1.2s ease;
+}
+
+/* BUTTON */
+.btn {
+    padding: 15px 35px;
+    background: linear-gradient(45deg, #c84d00, #dd6317);
+    color: white;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: bold;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    transition: 0.4s;
+}
+
+.btn:hover {
+    transform: scale(1.1);
+    background: linear-gradient(45deg, #64dd17, #00c853);
+}
+
+/* PRODUCTS SECTION */
+.products {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    padding: 80px 20px;
+    background: #e0b817;
+    flex-wrap: wrap;
+}
+
+/* CARD */
+.card {
+    width: 270px;
+    border-radius: 20px;
+    overflow: hidden;
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(15px);
+    box-shadow: 0 10px 30px rgba(185, 126, 17, 0.5);
+    transition: 0.4s;
+}
+
+.card:hover {
+    transform: translateY(-15px) scale(1.05);
+    box-shadow: 0 0 20px #e6b800;
+}
+
+/* IMAGE */
+.card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+/* TEXT */
+.card h3 {
+    text-align: center;
+    padding: 15px;
+}
+
+/* SECTIONS */
+.section {
+    padding: 80px 20px;
+    text-align: center;
+}
+
+/* GLASS SECTIONS */
+.about, .mission, .contact {
+    margin: 30px auto;
+    width: 80%;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+}
+
+/* DIFFERENT COLORS */
+.about { border-left: 5px solid #00e676; }
+.mission { border-left: 5px solid #ffea00; }
+.contact { border-left: 5px solid #00b0ff; }
+
+/* ANIMATIONS */
+@keyframes fadeDown {
+    from {opacity: 0; transform: translateY(-40px);}
+    to {opacity: 1; transform: translateY(0);}
+}
+
+@keyframes fadeUp {
+    from {opacity: 0; transform: translateY(40px);}
+    to {opacity: 1; transform: translateY(0);}
+}
+
+</style>
+
+<!-- HERO -->
+<div class="hero">
+    <h1>🌾 Fresh From Farm</h1>
+    <p>Organic • Fresh • Direct from Farmers</p>
+    <a href="{% url 'register' %}" class="btn">Get Started</a>
+</div>
+
+<!-- PRODUCTS -->
+<div class="products">
+    <div class="card">
+        <img src="{% static 'images/veg.jpg' %}">
+        <h3>🥕 Fresh Vegetables</h3>
+    </div>
+
+    <div class="card">
+        <img src="{% static 'images/fruit.jpg' %}">
+        <h3>🍎 Organic Fruits</h3>
+    </div>
+
+    <div class="card">
+        <img src="{% static 'images/rice.jpg' %}">
+        <h3>🌾 Grains & Rice</h3>
+    </div>
+</div>
+
+<!-- INFO -->
+<div class="section">
+    <h1>Welcome to Farmer to Consumer</h1>
+    <p>Connecting farmers and customers with trust and freshness</p>
+</div>
+
+<!-- ABOUT -->
+<div class="section about">
+    <h2>🌱 About Us</h2>
+    <p>
+        We empower farmers by giving them direct access to customers,
+        ensuring better income and fresh products.
+    </p>
+</div>
+
+<!-- MISSION -->
+<div class="section mission">
+    <h2>🚀 Our Mission</h2>
+    <p>
+        Eliminate middlemen and build a transparent supply chain.
+    </p>
+</div>
+
+<!-- CONTACT -->
+<div class="section contact">
+    <h2>📞 Contact Us</h2>
+    <p>Email: sshrushtiganiger@gmail.com</p>
+</div>
+
+{% endblock %}

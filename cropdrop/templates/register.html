@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+
+/* Center wrapper */
+.form-wrapper {
+    height: 90vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* 💎 Glass Card */
+.form-box {
+    width: 380px;
+    padding: 35px;
+    border-radius: 20px;
+
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(15px);
+
+    box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+    text-align: center;
+    color: white;
+
+    animation: fadeIn 1s ease;
+}
+
+/* Hover glow */
+.form-box:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 0 25px #00e676;
+}
+
+/* Heading */
+.form-box h2 {
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.form-box p {
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+/* Inputs */
+.input-box {
+    margin: 15px 0;
+}
+
+.input-box input,
+.input-box select {
+    width: 100%;
+    padding: 12px;
+    border-radius: 25px;
+    border: none;
+    outline: none;
+
+    background: rgba(255,255,255,0.15);
+    color: white;
+}
+
+/* Placeholder */
+.input-box input::placeholder {
+    color: #ccc;
+}
+
+/* Dropdown text color fix */
+.input-box select {
+    color: white;
+}
+
+/* Glow effect */
+.input-box input:focus,
+.input-box select:focus {
+    box-shadow: 0 0 12px #00e676;
+}
+
+/* Button */
+button {
+    width: 100%;
+    padding: 12px;
+    border-radius: 25px;
+    border: none;
+
+    background: linear-gradient(45deg, #00c853, #64dd17);
+    color: white;
+    font-weight: bold;
+
+    transition: 0.3s;
+}
+
+button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px #00e676;
+}
+
+/* Messages */
+ul.messages {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 10px;
+}
+
+ul.messages li {
+    color: #ff5252;
+    font-weight: bold;
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from {opacity: 0; transform: translateY(30px);}
+    to {opacity: 1; transform: translateY(0);}
+}
+
+</style>
+
+<div class="form-wrapper">
+
+    <div class="form-box">
+
+        <h2>🌾 Create Account</h2>
+        <p>Join Farmer to Consumer</p>
+
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="input-box">
+                <input type="text" name="username" placeholder="👤 Username" required>
+            </div>
+
+            <div class="input-box">
+                <input type="email" name="email" placeholder="📧 Email" required>
+            </div>
+
+            <div class="input-box">
+                <input type="password" name="password" placeholder="🔒 Password" required>
+            </div>
+
+            <div class="input-box">
+                <input type="text" name="phone" placeholder="📱 Phone Number" required>
+            </div>
+
+            <div class="input-box">
+                <select name="role">
+                    <option value="farmer">🌾 Farmer</option>
+                    <option value="customer">🛒 Customer</option>
+                </select>
+            </div>
+
+            <div class="input-box">
+                <input type="text" name="extra"
+                placeholder="📍 Location / Address" required>
+            </div>
+
+            <button type="submit">Register</button>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+/* Dashboard title */
+h2 {
+    text-align: center;
+    color: #2e7d32;
+    font-size: 36px;
+    margin-bottom: 30px;
+}
+
+/* Buttons: Add Product / Orders */
+.dashboard-btn {
+    display: inline-block;
+    margin: 10px;
+    padding: 12px 25px;
+    background: yellow;
+    color: black;
+    font-weight: bold;
+    border-radius: 25px;
+    text-decoration: none;
+    box-shadow: 0 8px 15px rgba(0,0,0,0.3);
+    transition: all 0.3s ease;
+}
+
+.dashboard-btn:hover {
+    background: orange;
+    transform: scale(1.1) rotateY(10deg);
+}
+
+/* Product cards wrapper */
+.cards-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 40px;
+}
+
+/* Individual product card */
+.card {
+    width: 250px;
+    height: 450px;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    transition: transform 0.5s, box-shadow 0.5s;
+    transform-style: preserve-3d;
+    overflow: hidden;
+    position: relative;
+}
+
+.card:hover {
+    transform: rotateY(15deg) rotateX(10deg);
+    box-shadow: 0 25px 50px rgba(0,0,0,0.4);
+}
+
+/* Product image */
+.card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 20px 20px 0 0;
+}
+
+/* Product info */
+.card h3 {
+    text-align: center;
+    margin: 10px 0 5px 0;
+    font-size: 20px;
+    color: #2e7d32;
+}
+
+.card p {
+    text-align: center;
+    font-size: 16px;
+    color: #555;
+    margin: 2px 0;
+}
+
+/* Delete button on card */
+.card a.delete-btn {
+    background: red;
+    color: white;
+    padding: 5px 12px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: bold;
+    display: inline-block;
+    margin-top: 10px;
+    transition: all 0.3s ease;
+}
+
+.card a.delete-btn:hover {
+    background: darkred;
+    transform: scale(1.1) rotateY(5deg);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .cards-wrapper {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+</style>
+
+<h2>Farmer Dashboard</h2>
+
+<div style="text-align:center; margin-bottom:20px;">
+    <h3>Total Products: {{ total_products }}</h3>
+    <h3>Total Orders: {{ total_orders }}</h3>
+</div>
+
+<div style="text-align:center; margin-bottom:20px;">
+    <a href="{% url 'add_product' %}" class="dashboard-btn">Add Product</a>
+    <a href="{% url 'orders' %}" class="dashboard-btn">View Orders</a>
+</div>
+
+
+
+
+<div class="cards-wrapper">
+    {% for product in products %}
+        <div class="card">
+            {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.name }}">
+            {% else %}
+                <img src="https://via.placeholder.com/250x200" alt="No Image">
+            {% endif %}
+            <h3>{{ product.name }}</h3>
+            <p><b>Farmer:</b> {{ product.farmer.user.username }}</p>
+            <p>Price: ₹{{ product.price }} / {{ product.unit }}</p>
+            <p>Qty: {{ product.quantity }}  {{ product.unit }}</p>
+
+            <div style="text-align:center;">
+                <a href="{% url 'delete_product' product.id %}" class="delete-btn">Delete</a>
+            </div>
+        </div>
+    {% empty %}
+        <p style="text-align:center; font-size:18px; color:#444;">No products added yet.</p>
+    {% endfor %}
+</div>
+
+
+{% endblock %}

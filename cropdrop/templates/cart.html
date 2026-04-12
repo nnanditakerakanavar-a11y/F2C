@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+/* Page title */
+h2 {
+    text-align: center;
+    color: #2e7d32;
+    font-size: 36px;
+    margin: 30px 0;
+}
+
+/* Cart container */
+.cart-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+}
+
+/* Cart item card */
+.cart-item {
+    width: 350px;
+    background: #fff;
+    border-radius: 20px;
+    padding: 15px;
+    display: flex;
+    gap: 15px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+    transition: transform 0.5s, box-shadow 0.5s;
+}
+
+.cart-item:hover {
+    transform: scale(1.03) rotateY(5deg);
+    box-shadow: 0 25px 50px rgba(0,0,0,0.4);
+}
+
+/* Product image */
+.cart-item img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 15px;
+}
+
+/* Item details */
+.item-details {
+    flex: 1;
+}
+
+.item-details h3 {
+    margin: 0 0 5px 0;
+    color: #2e7d32;
+    font-size: 20px;
+}
+
+.item-details p {
+    margin: 3px 0;
+    font-size: 16px;
+    color: #555;
+}
+
+/* Buttons */
+.item-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.item-buttons a, .item-buttons form button {
+    background: yellow;
+    color: black;
+    font-weight: bold;
+    border-radius: 20px;
+    padding: 8px 12px;
+    text-decoration: none;
+    border: none;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.item-buttons a:hover, .item-buttons form button:hover {
+    background: orange;
+    transform: scale(1.1) rotateY(3deg);
+}
+
+/* Total price card */
+.cart-total {
+    width: 350px;
+    background: #fff;
+    border-radius: 20px;
+    padding: 15px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+    text-align: center;
+}
+
+.cart-total h3 {
+    color: #2e7d32;
+    margin-bottom: 10px;
+}
+
+.cart-total p {
+    font-size: 18px;
+    margin: 5px 0;
+    font-weight: bold;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .cart-item {
+        width: 90%;
+        flex-direction: column;
+        align-items: center;
+    }
+    .item-buttons {
+        flex-direction: row;
+        justify-content: center;
+        gap: 15px;
+    }
+    .cart-total {
+        width: 90%;
+    }
+}
+</style>
+
+<h2>My Cart</h2>
+
+<div class="cart-wrapper">
+    {% for item in cart_items %}
+    <div class="cart-item">
+        {% if item.product.image %}
+            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+        {% else %}
+            <img src="https://via.placeholder.com/100" alt="No Image">
+        {% endif %}
+
+        <div class="item-details">
+            <h3>{{ item.product.name }}</h3>
+            <p>Price: ₹{{ item.product.price }}</p>
+            <p>Quantity: {{ item.quantity }} {{ item.product.unit }}</p>
+            <p>Total: ₹{{ item.total_price }}</p>
+        </div>
+
+        <div class="item-buttons">
+            {% if item.product %}
+            <a href="{% url 'place_order' item.product.id %}">Place Order</a>
+            {% else %}
+            <p>Product unavailable</p>
+            {% endif %}
+            <form action="{% url 'remove_from_cart' item.id %}" method="post">
+                {% csrf_token %}
+                <button type="submit">Remove</button>
+            </form>
+        </div>
+    </div>
+    {% empty %}
+        <p style="text-align:center; font-size:18px; color:#444;">Your cart is empty.</p>
+    {% endfor %}
+
+    {% if cart_items %}
+    <div class="cart-total">
+        <h3>Cart Total</h3>
+        <p>₹{{ cart_total }}</p>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

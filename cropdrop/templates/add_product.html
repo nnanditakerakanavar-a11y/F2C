@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+.form-box{
+    width: 350px;
+    margin: 50px auto;
+    padding: 30px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 30px rgba(0,0,0,0.2);
+    transform-style: preserve-3d;
+    transition: 0.5s;
+}
+
+.form-box:hover{
+    transform: rotateY(10deg);
+}
+
+input, select{
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 10px;
+    border: 1px solid gray;
+}
+
+button{
+    width: 100%;
+    padding: 10px;
+    background: yellow;
+    border: none;
+    border-radius: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover{
+    background: orange;
+    transform: scale(1.05);
+}
+
+.error{
+    color: red;
+    text-align: center;
+    margin-bottom: 10px;
+}
+</style>
+
+<div class="form-box">
+    <h2 align="center">Add Product</h2>
+
+    <!-- SHOW ERROR -->
+    {% if error %}
+        <p class="error">{{ error }}</p>
+    {% endif %}
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <input type="text" name="name" placeholder="Product Name" required>
+
+        <input type="number" step="0.01" name="price" placeholder="Price" required>
+
+        <input type="number" name="quantity" placeholder="Quantity" required>
+
+        <!-- Unit -->
+        <select name="unit" required>
+            <option value="">Select Unit</option>
+            <option value="kg">KG</option>
+            <option value="gram">Gram</option>
+            <option value="dozen">Dozen</option>
+            <option value="piece">Piece</option>
+        </select>
+
+        <!-- Category -->
+        <select name="category" required>
+            <option value="">Select Category</option>
+            {% for category in categories %}
+                <option value="{{ category.id }}">{{ category.name }}</option>
+            {% endfor %}
+        </select>
+
+        <!-- FILE INPUT -->
+        <input type="file" name="image" accept="image/*" required>
+
+        <button type="submit">Add Product</button>
+    </form>
+</div>
+
+{% endblock %}
