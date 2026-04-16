@@ -235,47 +235,59 @@ def add_to_cart(request, id):
 @login_required
 def place_order(request, id):
 
+    # ✅ Ensure only customers can place orders
+    if not hasattr(request.user, 'customer'):
+        return redirect('home')
+
     product = get_object_or_404(Product, id=id)
     customer = request.user.customer
-    customer_email = customer.user.email
 
     if request.method == "POST":
 
-        quantity = int(request.POST.get("quantity"))
-        unit = request.POST.get("unit")
 
-        # 🆕 New fields
-        name = request.POST.get("name")
-        phone = request.POST.get("phone")
-        address = request.POST.get("address")
-        city = request.POST.get("city")
-        pincode = request.POST.get("pincode")
+        # ✅ Get quantity safely
+        quantity = request.POST.get("quantity")
 
-        product_quantity = product.quantity
+        if not quantity:
+            return render(request, "place_order.html", {
+                "product": product,
+                "error": "Please enter quantity"
+            })
 
-        # ❌ Quantity check
-        if quantity > product_quantity:
+        try:
+            quantity = int(quantity)
+        except ValueError:
+            return render(request, "place_order.html", {
+                "product": product,
+                "error": "Invalid quantity"
+            })
+
+        # ✅ Get other fields safely
+        unit = request.POST.get("unit") or ""
+        name = request.POST.get("name") or ""
+        phone = request.POST.get("phone") or ""
+        address = request.POST.get("address") or ""
+        city = request.POST.get("city") or ""
+        pincode = request.POST.get("pincode") or ""
+
+        # ✅ Check stock
+        if quantity > product.quantity:
             return render(request, "place_order.html", {
                 "product": product,
                 "error": "Not enough quantity available"
             })
 
+        # ✅ Calculate price
         total_price = quantity * product.price
 
-        # Farmer details
-        farmer_email = product.farmer.user.email
-        farmer_name = product.farmer.user.username
-
-        # ✅ Save Order (UPDATED)
-        Order.objects.create(
+        # ✅ Save order
+        order = Order.objects.create(
             customer=customer,
             product=product,
             quantity=quantity,
             unit=unit,
             total_price=total_price,
             status='pending',
-
-            # 🆕 Save customer details
             name=name,
             phone=phone,
             address=address,
@@ -283,29 +295,63 @@ def place_order(request, id):
             pincode=pincode
         )
 
-        # 📧 Send email to farmer (UPDATED)
-        send_mail(
-            subject='New Order Received',
-            message=(
-                f'Hi {farmer_name},\n\n'
-                f'You received a new order for {product.name}.\n\n'
-                f'👤 Customer: {name}\n'
-                f'📞 Phone: {phone}\n'
-                f'📍 Address: {address}, {city} - {pincode}\n\n'
-                f'📦 Quantity: {quantity} {unit}\n'
-                f'💰 Total Price: ₹{total_price}'
-            ),
-            from_email='snehaangadi690@gmail.com',
-            recipient_list=[farmer_email],
-        )
-
-        # 🔻 Reduce product quantity
-        product.quantity = product_quantity - quantity
+        # ✅ Reduce product quantity
+        product.quantity -= quantity
         product.save()
+
+    
+        # ✅ Send email safely (won’t crash app)
+        try:
+            print("SENDGRID KEY:", os.getenv('SENDGRID_API_KEY'))
+            print("FROM EMAIL:", settings.DEFAULT_FROM_EMAIL)
+
+            farmer_email = product.farmer.user.email
+            farmer_name = product.farmer.user.username
+
+            message = Mail(
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to_emails=[farmer_email],
+                subject='New Order Received 🌱',
+
+
+                # ✅ VERY IMPORTANT (reduces spam)
+                plain_text_content=f"""New Order Received!
+
+Product: {product.name}
+Customer: {name}
+Phone: {phone}
+Address: {address}, {city} - {pincode}
+Quantity: {quantity} {unit}
+Total Price: ₹{total_price}
+""",
+
+                html_content=f"""
+<p>Hi {farmer_name},</p>
+<p>You received a new order for <b>{product.name}</b>.</p>
+<p>
+👤 Customer: {name}<br>
+📞 Phone: {phone}<br>
+📍 Address: {address}, {city} - {pincode}<br><br>
+📦 Quantity: {quantity} {unit}<br>
+💰 Total Price: ₹{total_price}
+</p>
+"""
+)
+
+            # ✅ ADD THIS (important for trust)
+            message.reply_to = settings.DEFAULT_FROM_EMAIL
+
+            sg = SendGridAPIClient(os.getenv('SENDGRID_API_KEY'))
+            response = sg.send(message)
+
+            print("EMAIL STATUS:", response.status_code)
+
+        except Exception as e:
+            print("EMAIL ERROR:", e)
 
         return redirect("orders")
 
-    return render(request, "place_order.html", {"product": product})
+    return render(request, "place_order.html", {"product": product}
 
 @login_required
 def update_order_status(request, id):
@@ -317,21 +363,59 @@ def update_order_status(request, id):
         order.status = status
         order.save()
 
-        customer_email = order.customer.user.email
 
-        send_mail(
-            subject="Order Status Updated",
-            message=f"Your order for {order.product.name} is now: {status}",
-            from_email="Farmer Market <nnanditakerakanavar@gmail.com>",
-            recipient_list=[customer_email],
-        )
+        try:
+            print("SENDGRID KEY:", os.getenv('SENDGRID_API_KEY'))
+            print("FROM EMAIL:", settings.DEFAULT_FROM_EMAIL)
+            
+            customer_email = order.customer.user.email
+            customer_name = order.customer.user.username
 
+            message = Mail(
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to_emails=customer_email,
+                subject="Order Status Updated 🌱",
+
+                plain_text_content=f"""Hi {customer_name},
+
+Your order has been updated.
+
+Product: {order.product.name}
+Status: {status}
+Total Price: ₹{order.total_price}
+
+Thank you for shopping with us!
+""",
+
+                html_content=f"""
+<p>Hi {customer_name},</p>
+<p>Your order for <b>{order.product.name}</b> has been updated.</p>
+<p>
+📦 Status: <b>{status}</b><br>
+💰 Total Price: ₹{order.total_price}
+</p>
+<p>Thank you for shopping with us! 🌱</p>
+"""
+)
+
+            # ✅ ADD THIS
+            message.reply_to = settings.DEFAULT_FROM_EMAIL
+
+            sg = SendGridAPIClient(os.getenv('SENDGRID_API_KEY'))
+            response = sg.send(message)
+
+            print("EMAIL STATUS:", response.status_code)
+
+        except Exception as e:
+            print("EMAIL ERROR:", e)
     return redirect("orders")
 
 
 
 @login_required
 def orders(request):
+
+    orders = None
 
     # If logged user is a customer
     if hasattr(request.user, 'customer'):
@@ -344,10 +428,11 @@ def orders(request):
         products = Product.objects.filter(farmer=farmer)
         orders = Order.objects.filter(product__in=products).order_by('-created_at')
 
+    else:
+        orders =[]
+
 
     return render(request, 'orders.html', {'orders': orders})
-
-
 
 
 
