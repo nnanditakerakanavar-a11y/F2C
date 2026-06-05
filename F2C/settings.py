@@ -134,7 +134,8 @@ LOGOUT_REDIRECT_URL = '/'
 
 
 
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+DEFAULT_FROM_EMAIL = os.getenv('EMAIL_FROM_EMAIL')
 
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
