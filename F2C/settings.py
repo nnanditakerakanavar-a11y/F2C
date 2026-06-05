@@ -150,6 +150,8 @@ cloudinary.config(
     api_key=os.getenv('API_KEY'),
     api_secret=os.getenv('API_SECRET')
 )
+print("CLOUD_NAME =", os.getenv('CLOUD_NAME'))
+print("API_KEY =", os.getenv('API_KEY'))
 
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.getenv('CLOUD_NAME'),
