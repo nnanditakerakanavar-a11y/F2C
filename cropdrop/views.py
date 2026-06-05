@@ -235,7 +235,6 @@ def add_to_cart(request, id):
 @login_required
 def place_order(request, id):
 
-    # ✅ Ensure only customers can place orders
     if not hasattr(request.user, 'customer'):
         return redirect('home')
 
@@ -244,8 +243,6 @@ def place_order(request, id):
 
     if request.method == "POST":
 
-
-        # ✅ Get quantity safely
         quantity = request.POST.get("quantity")
 
         if not quantity:
@@ -262,7 +259,6 @@ def place_order(request, id):
                 "error": "Invalid quantity"
             })
 
-        # ✅ Get other fields safely
         unit = request.POST.get("unit") or ""
         name = request.POST.get("name") or ""
         phone = request.POST.get("phone") or ""
@@ -270,17 +266,14 @@ def place_order(request, id):
         city = request.POST.get("city") or ""
         pincode = request.POST.get("pincode") or ""
 
-        # ✅ Check stock
         if quantity > product.quantity:
             return render(request, "place_order.html", {
                 "product": product,
                 "error": "Not enough quantity available"
             })
 
-        # ✅ Calculate price
         total_price = quantity * product.price
 
-        # ✅ Save order
         order = Order.objects.create(
             customer=customer,
             product=product,
@@ -295,16 +288,11 @@ def place_order(request, id):
             pincode=pincode
         )
 
-        # ✅ Reduce product quantity
         product.quantity -= quantity
         product.save()
 
-    
-        # ✅ Send email safely (won’t crash app)
+        # EMAIL
         try:
-            print("SENDGRID KEY:", os.getenv('SENDGRID_API_KEY'))
-            print("FROM EMAIL:", settings.DEFAULT_FROM_EMAIL)
-
             farmer_email = product.farmer.user.email
             farmer_name = product.farmer.user.username
 
@@ -312,10 +300,8 @@ def place_order(request, id):
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 to_emails=[farmer_email],
                 subject='New Order Received 🌱',
-
-
-                # ✅ VERY IMPORTANT (reduces spam)
-                plain_text_content=f"""New Order Received!
+                plain_text_content=f"""
+New Order Received!
 
 Product: {product.name}
 Customer: {name}
@@ -324,34 +310,28 @@ Address: {address}, {city} - {pincode}
 Quantity: {quantity} {unit}
 Total Price: ₹{total_price}
 """,
-
                 html_content=f"""
 <p>Hi {farmer_name},</p>
 <p>You received a new order for <b>{product.name}</b>.</p>
 <p>
-👤 Customer: {name}<br>
-📞 Phone: {phone}<br>
-📍 Address: {address}, {city} - {pincode}<br><br>
-📦 Quantity: {quantity} {unit}<br>
-💰 Total Price: ₹{total_price}
+Customer: {name}<br>
+Phone: {phone}<br>
+Address: {address}, {city} - {pincode}<br><br>
+Quantity: {quantity} {unit}<br>
+Total Price: ₹{total_price}
 </p>
 """
-)
-
-            # ✅ ADD THIS (important for trust)
-            message.reply_to = settings.DEFAULT_FROM_EMAIL
+            )
 
             sg = SendGridAPIClient(os.getenv('SENDGRID_API_KEY'))
-            response = sg.send(message)
-
-            print("EMAIL STATUS:", response.status_code)
+            sg.send(message)
 
         except Exception as e:
             print("EMAIL ERROR:", e)
 
         return redirect("orders")
 
-    return render(request, "place_order.html", {"product": product}
+    return render(request, "place_order.html", {"product": product})
 
 @login_required
 def update_order_status(request, id):

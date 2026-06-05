@@ -122,6 +122,10 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
+
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 LOGIN_URL = '/login/'
@@ -130,7 +134,7 @@ LOGOUT_REDIRECT_URL = '/'
 
 
 
-DEFAULT_FROM_EMAIL = os.getenv('EMAIL_FROM_EMAIL')
+
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
@@ -168,4 +172,18 @@ SESSION_COOKIE_SAMESITE = 'None'
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
+
+# EMAIL CONFIGURATION (Gmail SMTP)
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+EMAIL_HOST_USER = os.getenv( 'sshrushtiganiger@gmail.com')   # your gmail
+EMAIL_HOST_PASSWORD = os.getenv('ggha lypz twok vltj')  # app password
+
+DEFAULT_FROM_EMAIL = 'sshrushtiganiger@gmail.com'
+
+EMAIL_TIMEOUT = 20
 
